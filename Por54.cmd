@@ -28,47 +28,16 @@ set pend=);
 
 :package
 if "%~1" NEQ "" (
-	tasklist|findstr "firefox.exe" && taskkill /im firefox.exe
-	for %%b in (cache healthreport minidumps offlinecache safebrowsing startupcache webapps weave thumbnails healthreport.sqlite healthreport.sqlite-wal webappsstore.sqlite _cache_clean_ jumpListCache searchplugins) do (
-		if exist "%pfdir%\%%b\" (
-			rd /s /q "%pfdir%\%%b" >nul
-			) else (
-				if exist "%pfdir%\%%b" (
-					del /f /q "%pfdir%\%%b" >nul
-					)
-				)
-			)
-	set cmdstr=MAKECAB /v3 /D CompressionType=LZX /D CompressionMemory=21 /D MaxDiskSize=CDROM /D Cabinet=On /D Compress=On /D FolderSizeThreshold=5000000 /D DiskDirectoryTemplate="%~dp1." /D CabinetNameTemplate="Por54_Profiles.CAB"
-	if exist cabstr del cabstr >nul
-	set "fullname=%~1"
-	set "fullname=!fullname:~0,-1!"
-	echo !fullname!&pause
-	for /f "delims=" %%i in (patch) do (
-		set "fullname=%%i"
-		set "fullname=!fullname:~0,-1!"
-		if exist "!fullname!\" (
-			for /f "delims=" %%a in ('dir "!fullname!" /s /b /a-d') do (
-			SETLOCAL DISABLEDELAYEDEXPANSION
-			set name=%%a
-			call set "name=%%name:!=|%%"
-			SETLOCAL ENABLEDELAYEDEXPANSION
-			echo !name!>>cabstr
-			ENDLOCAL
-			ENDLOCAL
-			)) else (
-			echo %%i>>cabstr
-			)
-		)
-	if exist patch del patch >nul	
-	SETLOCAL DISABLEDELAYEDEXPANSION
-	(for /f "delims=" %%a in (cabstr) do (
-		set "str=%%a"
-		call :fun
-		))>cab
-	ENDLOCAL
-	%cmdstr% /F cab
-	del /f/q cab cabstr SETUP.INF SETUP.RPT >nul
-	exit
+	echo %~1 >patch
+	if "%~2" NEQ "" echo %~2 >>patch
+	if "%~3" NEQ "" echo %~3 >>patch
+	if "%~4" NEQ "" echo %~4 >>patch
+	if "%~5" NEQ "" echo %~5 >>patch
+	if "%~6" NEQ "" echo %~6 >>patch
+	if "%~7" NEQ "" echo %~7 >>patch
+	if "%~8" NEQ "" echo %~8 >>patch
+	if "%~9" NEQ "" echo %~9 >>patch
+	call :packagemod
 	)
 if exist Por54_Profiles.cab (
 	if not exist "%PFDir%" call :unpackmod
@@ -199,6 +168,45 @@ echo ;Please do not change filename>>!ini!.ini
 start "" /wait notepad !ini!.ini
 goto init
 
+:packagemod
+tasklist|findstr "firefox.exe" && taskkill /im firefox.exe
+for %%b in (cache healthreport minidumps offlinecache safebrowsing startupcache webapps weave thumbnails healthreport.sqlite healthreport.sqlite-wal webappsstore.sqlite _cache_clean_ jumpListCache searchplugins) do (
+	if exist "%pfdir%\%%b\" (
+		rd /s /q "%pfdir%\%%b" >nul
+		) else (
+			if exist "%pfdir%\%%b" (
+				del /f /q "%pfdir%\%%b" >nul
+				)
+			)
+		)
+set cmdstr=MAKECAB /v3 /D CompressionType=LZX /D CompressionMemory=21 /D MaxDiskSize=CDROM /D Cabinet=On /D Compress=On /D FolderSizeThreshold=5000000 /D DiskDirectoryTemplate="%~dp1." /D CabinetNameTemplate="Por54_Profiles.CAB"
+if exist cabstr del cabstr >nul
+for /f "delims=" %%i in (patch) do (
+	set "fullname=%%i"
+	set "fullname=!fullname:~0,-1!"
+	if exist "!fullname!\" (
+		for /f "delims=" %%a in ('dir "!fullname!" /s /b /a-d') do (
+		SETLOCAL DISABLEDELAYEDEXPANSION
+		set name=%%a
+		call set "name=%%name:!=|%%"
+		SETLOCAL ENABLEDELAYEDEXPANSION
+		echo !name!>>cabstr
+		ENDLOCAL
+		ENDLOCAL
+		)) else (
+		echo %%i>>cabstr
+		)
+	)
+if exist patch del patch >nul	
+SETLOCAL DISABLEDELAYEDEXPANSION
+(for /f "delims=" %%a in (cabstr) do (
+	set "str=%%a"
+	call :fun
+	))>cab
+ENDLOCAL
+%cmdstr% /F cab
+del /f/q cab cabstr SETUP.INF SETUP.RPT >nul
+exit
 :fun
 set "str=%str:!=|%"
 setlocal enabledelayedexpansion
