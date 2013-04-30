@@ -25,6 +25,7 @@ for /f "delims=" %%i in ('findstr "=" "!ini!.ini"') do set "%%i"
 set prefs=%PFDir%\prefs.js
 set pstar=user_pref("
 set pend=);
+ver |findstr "5." &&start /wait mshta vbscript:msgbox("一些功能不支持NT5.X系统，将直接加载profile和启动参数运行",,"Por54")(windows.close)&goto run
 
 :package
 if "%~1" NEQ "" (
