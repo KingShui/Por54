@@ -27,7 +27,7 @@ set pstar=user_pref("
 set pend=);
 
 :package
-if if "%~1" NEQ "" (
+if "%~1" NEQ "" (
 	ver |findstr "5." &&start /wait mshta vbscript:msgbox("本功能暂不支持NT5.X系统，将跳过此功能启动",,"Por54")(windows.close)&goto preinit
 	if exist cabstr del cabstr >nul
 	goto packagemod
