@@ -1,10 +1,10 @@
 @echo off
 echo,CompanyName: KSSC
 echo,FileDescription: Firefox Loader
-echo,FileVersion: 0.0.0.31
+echo,FileVersion: 0.0.0.32
 echo,LegalCopyright: KingShui
 echo,ProductName: Firefox Loader
-echo,ProductVersion: 0.0.0.31
+echo,ProductVersion: 0.0.0.32
 echo,Created by KingShui
 echo,For reference, please indicate the source.
 :begin
@@ -25,26 +25,21 @@ for /f "delims=" %%i in ('findstr "=" "!ini!.ini"') do set "%%i"
 set prefs=%PFDir%\prefs.js
 set pstar=user_pref("
 set pend=);
-ver |findstr "5." &&start /wait mshta vbscript:msgbox("一些功能不支持NT5.X系统，将直接加载profile和启动参数运行",,"Por54")(windows.close)&goto run
 
 :package
-if "%~1" NEQ "" (
-	echo %~1 >patch
-	if "%~2" NEQ "" echo %~2 >>patch
-	if "%~3" NEQ "" echo %~3 >>patch
-	if "%~4" NEQ "" echo %~4 >>patch
-	if "%~5" NEQ "" echo %~5 >>patch
-	if "%~6" NEQ "" echo %~6 >>patch
-	if "%~7" NEQ "" echo %~7 >>patch
-	if "%~8" NEQ "" echo %~8 >>patch
-	if "%~9" NEQ "" echo %~9 >>patch
-	call :packagemod
+if if "%~1" NEQ "" (
+	ver |findstr "5." &&start /wait mshta vbscript:msgbox("本功能暂不支持NT5.X系统，将跳过此功能启动",,"Por54")(windows.close)&goto preinit
+	if exist cabstr del cabstr >nul
+	goto packagemod
 	)
 if exist Por54_Profiles.cab (
+	ver |findstr "5." &&start /wait mshta vbscript:msgbox("本功能暂不支持NT5.X系统，将跳过此功能启动",,"Por54")(windows.close)&goto preinit
 	if not exist "%PFDir%" call :unpackmod
 	)
 
 :preinit
+findstr
+if "%errorlevel%" equ "9009" goto run
 if "%FFPath%" == "" (
 	(dir /s/b | findstr "firefox.exe")>ffpath
 	set /p FFPath=<ffpath
@@ -181,24 +176,20 @@ for %%b in (cache healthreport minidumps offlinecache safebrowsing startupcache 
 			)
 		)
 set cmdstr=MAKECAB /v3 /D CompressionType=LZX /D CompressionMemory=21 /D MaxDiskSize=CDROM /D Cabinet=On /D Compress=On /D FolderSizeThreshold=5000000 /D DiskDirectoryTemplate="%~dp1." /D CabinetNameTemplate="Por54_Profiles.CAB"
-if exist cabstr del cabstr >nul
-for /f "delims=" %%i in (patch) do (
-	set "fullname=%%i"
-	set "fullname=!fullname:~0,-1!"
-	if exist "!fullname!\" (
-		for /f "delims=" %%a in ('dir "!fullname!" /s /b /a-d') do (
-		SETLOCAL DISABLEDELAYEDEXPANSION
-		set name=%%a
+set "fullname=%~1"
+if exist "!fullname!\" (
+	for /f "delims=" %%a in ('dir "!fullname!" /a-d /s /b') do (
+		setlocal disabledelayedexpansion
+		set "name=%%a"
 		call set "name=%%name:!=|%%"
-		SETLOCAL ENABLEDELAYEDEXPANSION
+		setlocal enabledelayedexpansion
 		echo !name!>>cabstr
-		ENDLOCAL
-		ENDLOCAL
+		endlocal
+		endlocal
 		)) else (
-		echo %%i>>cabstr
+		echo %~1>>cabstr
 		)
-	)
-if exist patch del patch >nul	
+if "%~2" neq "" shift&goto packagemod	
 SETLOCAL DISABLEDELAYEDEXPANSION
 (for /f "delims=" %%a in (cabstr) do (
 	set "str=%%a"
@@ -206,7 +197,7 @@ SETLOCAL DISABLEDELAYEDEXPANSION
 	))>cab
 ENDLOCAL
 %cmdstr% /F cab
-del /f/q cab cabstr SETUP.INF SETUP.RPT >nul
+del /f/q patch cab cabstr SETUP.INF SETUP.RPT >nul
 exit
 :fun
 set "str=%str:!=|%"
