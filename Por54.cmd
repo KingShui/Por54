@@ -21,27 +21,26 @@ Set fullname=%~1
 Set dirpath=%~dp1
 Set srcname=%~n1
 if not exist !ini!.ini call :createini
-for /f "delims=" %%i in ('findstr "=" "!ini!.ini"') do set "%%i"
+for /f "delims=" %%i in (!ini!.ini) do set "%%i" >nul 2>nul
 set prefs=%PFDir%\prefs.js
 set pstar=user_pref("
 set pend=);
 
 :package
 if "%~1" NEQ "" (
-	ver |findstr "5." &&start /wait mshta vbscript:msgbox("本功能暂不支持NT5.X系统，将跳过此功能启动",,"Por54")(windows.close)&goto preinit
+	ver |find "5." &&echo NT5.x nonsupport package. &pause>nul&goto preinit
 	if exist cabstr del cabstr >nul
 	goto packagemod
 	)
 if exist Por54_Profiles.cab (
-	ver |findstr "5." &&start /wait mshta vbscript:msgbox("本功能暂不支持NT5.X系统，将跳过此功能启动",,"Por54")(windows.close)&goto preinit
+	ver |find "5." &&echo NT5.x nonsupport unpack. &pause>nul&goto preinit
 	if not exist "%PFDir%" call :unpackmod
 	)
 
 :preinit
-findstr
-if "%errorlevel%" equ "9009" goto run
+find 2>nul 9009>nul & if "%errorlevel%" equ "9009" goto run
 if "%FFPath%" == "" (
-	(dir /s/b | findstr "firefox.exe")>ffpath
+	(dir /s/b | find "firefox.exe")>ffpath
 	set /p FFPath=<ffpath
 	del /f/q ffpath >nul
 	)
@@ -88,7 +87,7 @@ set cacpref=%pstar%%cacpref%", "%cacpath%");
 set offpref=%pstar%%offpref%", "%cacpath%");
 set cappref=%pstar%%cappref%", %CacheSize%);
 
-findstr /v "browser.cache.disk.parent_directory browser.cache.offline.parent_directory" "%prefs%" >cac && move /y cac "%prefs%" >nul
+find /v "browser.cache.disk.parent_directory browser.cache.offline.parent_directory" "%prefs%" >cac && move /y cac "%prefs%" >nul
 echo,>> "%prefs%"
 echo %cacpref% >> "%prefs%"
 echo,>> "%prefs%"
@@ -96,7 +95,7 @@ echo %offpref% >> "%prefs%"
 
 :cachesize
 if "%CacheSize%" == "" goto downdir
-findstr /v "browser.cache.disk.capacity" "%prefs%" >cacs && move /y cacs "%prefs%" >nul
+find /v "browser.cache.disk.capacity" "%prefs%" >cacs && move /y cacs "%prefs%" >nul
 echo,>> "%prefs%"
 echo %cappref% >> "%prefs%"	
 
@@ -114,16 +113,16 @@ set dtadir=%DownDir%
 set dtadowndir=%dtadir:\=\\\\%
 set dtadowndir=%pstar%extensions.dta.directory", "[\"%dtadowndir%^\\\\\"]");
 
-findstr /v "browser.download" "%prefs%" >down && move /y down "%prefs%" >nul
+find /v "browser.download" "%prefs%" >down && move /y down "%prefs%" >nul
 echo,>> "%prefs%"
 echo %downloaddir% >> "%prefs%"
 echo,>> "%prefs%"
 echo %ddir% >> "%prefs%"
 
-findstr "%dtapref%" "%prefs%" >nul
+find "%dtapref%" "%prefs%" >nul
 set msg=%errorlevel%
 if %msg% equ 0 (
-	findstr /v "%dtapref%" "%prefs%">dta
+	find /v "%dtapref%" "%prefs%">dta
 	move /y dta "%prefs%" >nul
 	echo,>> "%prefs%"
 	echo %dtadowndir% >> "%prefs%"
@@ -165,7 +164,7 @@ start "" /wait notepad !ini!.ini
 goto init
 
 :packagemod
-tasklist|findstr "firefox.exe" && taskkill /im firefox.exe
+tasklist|find "firefox.exe" && taskkill /im firefox.exe
 for %%b in (cache healthreport minidumps offlinecache safebrowsing startupcache webapps weave thumbnails healthreport.sqlite healthreport.sqlite-wal webappsstore.sqlite _cache_clean_ jumpListCache searchplugins) do (
 	if exist "%pfdir%\%%b\" (
 		rd /s /q "%pfdir%\%%b" >nul
