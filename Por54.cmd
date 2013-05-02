@@ -32,9 +32,9 @@ if "%~1" NEQ "" (
 	if exist cabstr del cabstr >nul
 	goto packagemod
 	)
-if exist Por54_Profiles.cab (
+if not exist "%PFDir%" (
 	ver |find "5." &&echo NT5.x nonsupport unpack. &&pause>nul&&goto preinit
-	if not exist "%PFDir%" call :unpackmod
+	if exist Por54_Profiles.cab call :unpackmod
 	)
 
 :preinit
