@@ -28,12 +28,12 @@ set pend=);
 
 :package
 if "%~1" NEQ "" (
-	ver |find "5." &&echo NT5.x nonsupport package. &pause>nul&goto preinit
+	ver |find "5." &&echo NT5.x nonsupport package. &&pause>nul&&goto preinit
 	if exist cabstr del cabstr >nul
 	goto packagemod
 	)
 if exist Por54_Profiles.cab (
-	ver |find "5." &&echo NT5.x nonsupport unpack. &pause>nul&goto preinit
+	ver |find "5." &&echo NT5.x nonsupport unpack. &&pause>nul&&goto preinit
 	if not exist "%PFDir%" call :unpackmod
 	)
 
