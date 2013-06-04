@@ -1,18 +1,17 @@
-@echo off
-echo,CompanyName: KSSC
-echo,FileDescription: Firefox Loader
-echo,FileVersion: 0.0.0.32
-echo,LegalCopyright: KingShui
-echo,ProductName: Firefox Loader
-echo,ProductVersion: 0.0.0.32
-echo,Created by KingShui
-echo,For reference, please indicate the source.
+@echo off &title Por54 Firefox Loader By KingShui & mode con cols=55 lines=9
+echo,	CompanyName: KSSC
+echo,	FileDescription: Firefox Loader
+echo,	FileVersion: 0.0.0.32
+echo,	LegalCopyright: KingShui
+echo,	ProductName: Firefox Loader
+echo,	ProductVersion: 0.0.0.32
+echo,	Created by KingShui
+echo,	For reference, please indicate the source.
 :begin
 set "key=%~dp0"
 set "key=%key:!=|%"
 setlocal enableextensions
 setlocal enabledelayedexpansion
-title Por54 Firefox Loader By KingShui
 	
 :init
 set fpath=%~dp0
@@ -22,9 +21,6 @@ Set dirpath=%~dp1
 Set srcname=%~n1
 if not exist !ini!.ini call :createini
 for /f "delims=" %%i in (!ini!.ini) do set "%%i" >nul 2>nul
-set prefs=%PFDir%\prefs.js
-set pstar=user_pref("
-set pend=);
 
 :package
 if "%~1" NEQ "" (
@@ -38,44 +34,38 @@ if not exist "%PFDir%" (
 	)
 
 :preinit
+set prefs=%PFDir%\prefs.js
+set pstar=user_pref("
+set pend=);
 find 2>nul 9009>nul & if "%errorlevel%" equ "9009" goto run
 if "%FFPath%" == "" (
 	(dir /s/b | find "firefox.exe")>ffpath
 	set /p FFPath=<ffpath
 	del /f/q ffpath >nul
 	)
-
 if not exist "%FFPath%" exit
-if not exist %prefs% goto run
-
 if "%FFPath:~1,1%" NEQ ":" (
 	set "FFPath=%fpath%%FFPath%"
 	)
-
-if "%DownDir:~1,1%" NEQ ":" (
-	set "DownDir=%fpath%%DownDir%"
-	)
-	
+if not exist "%PFDir%" goto plugin
 if "%PFDir:~1,1%" NEQ ":" (
 	set "PFDir=%fpath%%PFDir%"
 	)
+if not exist %prefs% goto run
 
-if "%cachedir:~1,1%" NEQ ":" (
-	set "cachedir=%fpath%%cachedir%"
-	)	
-
-if "%Plugin:~1,1%" NEQ ":" (
-	set "Plugin=%fpath%%Plugin%"
-	)	
-
-		
 :plugin
 if "%Plugin%" == "" goto cache
+if "%Plugin:~1,1%" NEQ ":" (
+	set "Plugin=%fpath%%Plugin%"
+	)
 if not exist "%Plugin%" md "%Plugin%"
 set "MOZ_PLUGIN_PATH=%Plugin%"
 
 :cache
 if "%CacheDir%" == "" goto cachesize
+if "%cachedir:~1,1%" NEQ ":" (
+	set "cachedir=%fpath%%cachedir%"
+	)
 if not exist "%CacheDir%" md "%CacheDir%"
 
 set cacpref=browser.cache.disk.parent_directory
@@ -101,6 +91,9 @@ echo %cappref% >> "%prefs%"
 
 :downdir
 if "%DownDir%" == "" goto run
+if "%DownDir:~1,1%" NEQ ":" (
+	set "DownDir=%fpath%%DownDir%"
+	)
 if not exist "%DownDir%" md "%DownDir%"
 
 set downloaddir=%DownDir%
@@ -129,6 +122,7 @@ if %msg% equ 0 (
 	)	
 :run
 start "" "%FFPath%" %params% -profile "%PFDir%"
+ping 127.1 -n 3 >nul
 exit
 
 :unpackmod

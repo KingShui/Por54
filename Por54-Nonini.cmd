@@ -65,38 +65,29 @@ if "%FFPath%" == "" (
 	set /p FFPath=<ffpath
 	del /f/q ffpath >nul
 	)
-
 if not exist "%FFPath%" exit
-if not exist %prefs% goto run
-
 if "%FFPath:~1,1%" NEQ ":" (
 	set "FFPath=%fpath%%FFPath%"
 	)
-
-if "%DownDir:~1,1%" NEQ ":" (
-	set "DownDir=%fpath%%DownDir%"
-	)
-	
+if not exist "%PFDir%" goto plugin	
 if "%PFDir:~1,1%" NEQ ":" (
 	set "PFDir=%fpath%%PFDir%"
 	)
-
-if "%cachedir:~1,1%" NEQ ":" (
-	set "cachedir=%fpath%%cachedir%"
-	)	
-
-if "%Plugin:~1,1%" NEQ ":" (
-	set "Plugin=%fpath%%Plugin%"
-	)	
-
+if not exist %prefs% goto run
 		
 :plugin
 if "%Plugin%" == "" goto cache
+if "%Plugin:~1,1%" NEQ ":" (
+	set "Plugin=%fpath%%Plugin%"
+	)
 if not exist "%Plugin%" md "%Plugin%"
 set "MOZ_PLUGIN_PATH=%Plugin%"
 
 :cache
 if "%CacheDir%" == "" goto cachesize
+if "%cachedir:~1,1%" NEQ ":" (
+	set "cachedir=%fpath%%cachedir%"
+	)
 if not exist "%CacheDir%" md "%CacheDir%"
 
 set cacpref=browser.cache.disk.parent_directory
@@ -122,6 +113,9 @@ echo %cappref% >> "%prefs%"
 
 :downdir
 if "%DownDir%" == "" goto run
+if "%DownDir:~1,1%" NEQ ":" (
+	set "DownDir=%fpath%%DownDir%"
+	)
 if not exist "%DownDir%" md "%DownDir%"
 
 set downloaddir=%DownDir%
